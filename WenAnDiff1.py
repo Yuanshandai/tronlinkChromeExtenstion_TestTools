@@ -22,12 +22,12 @@ class ExcelHandle(object):
         self.wb = openpyxl.load_workbook(self.file_name)
         self.sh = self.wb[self.sheet_name]
 
-    def get_data_dict(self) -> dict:
+    def get_data_dict(self, num) -> dict:
         """读取数据存储在字典中"""
         self.__open()
         rows = list(self.sh.rows)
         return [dict(zip([i.value for i in rows[0]], [r.value for r in row]))
-                for row in rows[1:]]
+                for row in rows[1:num]]
 
     def get_data_obj(self) -> list:
         """读取数据存储在类中"""
@@ -52,45 +52,91 @@ class ExcelHandle(object):
 if __name__ == '__main__':
     file = "/Users/liqi/Desktop/文档/产品文档.xlsx"
     eh = ExcelHandle(file, "仅V4")
-    data = eh.get_data_dict()  # list类型
+    data = eh.get_data_dict(665)  # list类型
     # print(data)
     with open("/Users/liqi/Documents/tronlink-extension-pro/src/i18n/en.json", 'r') as f:
         load_dict_en = json.load(f)
-    print(load_dict_en)
+    # print(load_dict_en)
     with open("/Users/liqi/Documents/tronlink-extension-pro/src/i18n/ja.json", 'r') as f:
         load_dict_ja = json.load(f)
-    print(load_dict_ja)
+    # print(load_dict_ja)
     with open("/Users/liqi/Documents/tronlink-extension-pro/src/i18n/zh_CN.json", 'r') as f:
         load_dict_zh = json.load(f)
 
-print(load_dict_zh)
+# print(load_dict_zh)
 list = list(load_dict_zh.keys())
-print(list)
+# print(list)
 dict_zh = {}
 dict_en = {}
 dict_jp = {}
-for i in list:
+
+for dict in data:
     # 遍历excel中的key,写三个dict(中，英，日)
-    for dict in data:
-        if (dict['key'] == i):
-            dict_zh[i] = dict['zh']
-            dict_en[i] = dict['en']
-            dict_jp[i] = dict['jp']
+
+    dict_zh[dict['key']] = dict['zh']
+    dict_en[dict['key']] = dict['en']
+    dict_jp[dict['key']] = dict['jp']
 
 print('对比中文文案结果:')
 print(load_dict_zh == dict_zh)
-diff = load_dict_zh.keys() & dict_zh
-diff_vals = [(k, load_dict_zh[k], dict_zh[k]) for k in diff if load_dict_zh[k] != dict_zh[k]]
-print(diff_vals)
+
+diff_key = load_dict_zh.keys() ^ dict_zh.keys()
+# print(diff_key)
+list_result_zn = []
+for i in diff_key:
+    list1 = []
+    list1.append(i)
+    if i in load_dict_zh.keys():
+        list1.append(load_dict_zh[i])
+    else:
+        list1.append("空")
+
+    if i in dict_zh.keys():
+        list1.append(dict_zh[i])
+    else:
+        list1.append("空")
+
+    list_result_zn.append(list1)
+print(list_result_zn)
 
 print('对比英文文案结果:')
 print(load_dict_en == dict_en)
-diff = load_dict_en.keys() & dict_en
-diff_vals = [(k, load_dict_en[k], dict_en[k]) for k in diff if load_dict_en[k] != dict_en[k]]
-print(diff_vals)
+diff_key = load_dict_en.keys() ^ dict_en.keys()
+# print(diff_key)
+list_result_en = []
+for i in diff_key:
+    list1 = []
+    list1.append(i)
+    if i in load_dict_en.keys():
+        list1.append(load_dict_en[i])
+    else:
+        list1.append("空")
+
+    if i in dict_zh.keys():
+        list1.append(dict_en[i])
+    else:
+        list1.append("空")
+
+    list_result_en.append(list1)
+print(list_result_en)
 
 print('对比日文文案结果:')
 print(load_dict_ja == dict_jp)
-diff = load_dict_ja.keys() & dict_jp
-diff_vals = [(k, load_dict_ja[k], dict_jp[k]) for k in diff if load_dict_ja[k] != dict_jp[k]]
-print(diff_vals)
+diff_key = load_dict_ja.keys() ^ dict_jp.keys()
+# print(diff_key)
+list_result_ja = []
+for i in diff_key:
+    list1 = []
+    list1.append(i)
+    if i in load_dict_ja.keys():
+        list1.append(load_dict_ja[i])
+    else:
+        list1.append("空")
+
+    if i in dict_jp.keys():
+        list1.append(dict_jp[i])
+    else:
+        list1.append("空")
+
+    list_result_ja.append(list1)
+print(list_result_ja)
